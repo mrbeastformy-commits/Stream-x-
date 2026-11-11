@@ -1,0 +1,247 @@
+{
+  "entities": {
+    "MediaItem": {
+      "title": "MediaItem",
+      "description": "Represents a movie, drama, episode, cartoon or YouTube video in STREAMX",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "type": { "type": "string", "enum": ["movie", "drama", "cartoon", "youtube"] },
+        "category": { "type": "string", "maxLength": 100 },
+        "genre": { "type": "string", "maxLength": 100 },
+        "year": { "type": "string", "maxLength": 10 },
+        "language": { "type": "string", "maxLength": 50 },
+        "country": { "type": "string", "maxLength": 50 },
+        "posterUrl": { "type": "string", "maxLength": 2000 },
+        "backdropUrl": { "type": "string", "maxLength": 2000 },
+        "videoUrl": { "type": "string", "maxLength": 2000 },
+        "videoSource": { "type": "string", "enum": ["upload", "youtube", "direct", "hls"] },
+        "youtubeVideoId": { "type": "string", "maxLength": 100 },
+        "duration": { "type": "string", "maxLength": 50 },
+        "isPublished": { "type": "boolean" },
+        "isFeatured": { "type": "boolean" },
+        "isPremiumOnly": { "type": "boolean" },
+        "testStatus": { "type": "string", "enum": ["untested", "working", "error"] },
+        "lastTestedAt": { "type": "string", "maxLength": 50 },
+        "lastTestError": { "type": "string", "maxLength": 500 },
+        "seasonsCount": { "type": "number" },
+        "episodesCount": { "type": "number" },
+        "createdBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["title", "type", "category", "isPublished", "videoUrl"]
+    },
+    "Episode": {
+      "title": "Episode",
+      "description": "An episode of a drama series or cartoon series",
+      "type": "object",
+      "properties": {
+        "mediaId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "seasonNumber": { "type": "number" },
+        "episodeNumber": { "type": "number" },
+        "videoUrl": { "type": "string", "maxLength": 2000 },
+        "videoSource": { "type": "string", "enum": ["upload", "youtube", "direct", "hls"] },
+        "youtubeVideoId": { "type": "string", "maxLength": 100 },
+        "duration": { "type": "string", "maxLength": 50 },
+        "posterUrl": { "type": "string", "maxLength": 2000 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "isPublished": { "type": "boolean" },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["mediaId", "title", "videoUrl", "episodeNumber"]
+    },
+    "LiveChannel": {
+      "title": "LiveChannel",
+      "description": "A live TV channel broadcast stream",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 150 },
+        "logoUrl": { "type": "string", "maxLength": 2000 },
+        "category": { "type": "string", "maxLength": 100 },
+        "country": { "type": "string", "maxLength": 50 },
+        "language": { "type": "string", "maxLength": 50 },
+        "streamUrl": { "type": "string", "maxLength": 2000 },
+        "status": { "type": "string", "enum": ["LIVE", "OFFLINE", "CHECKING", "UNAVAILABLE"] },
+        "testStatus": { "type": "string", "enum": ["untested", "working", "error"] },
+        "lastTestedAt": { "type": "string", "maxLength": 50 },
+        "lastError": { "type": "string", "maxLength": 500 },
+        "isPublished": { "type": "boolean" },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["name", "category", "streamUrl", "isPublished"]
+    },
+    "UserVideo": {
+      "title": "UserVideo",
+      "description": "User-uploaded video awaiting moderation or published",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "userEmail": { "type": "string", "maxLength": 150 },
+        "userName": { "type": "string", "maxLength": 100 },
+        "title": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "category": { "type": "string", "maxLength": 100 },
+        "videoUrl": { "type": "string", "maxLength": 2000 },
+        "thumbnailUrl": { "type": "string", "maxLength": 2000 },
+        "fileSizeMb": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "rejectionReason": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["userId", "title", "videoUrl", "status"]
+    },
+    "PremiumPlan": {
+      "title": "PremiumPlan",
+      "description": "Configurable subscription tier for STREAMX",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "billingCycle": { "type": "string", "enum": ["monthly", "yearly"] },
+        "price": { "type": "number" },
+        "currency": { "type": "string", "maxLength": 10 },
+        "features": { "type": "string", "maxLength": 1000 },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["name", "billingCycle", "price", "currency", "isActive"]
+    },
+    "PaymentTransaction": {
+      "title": "PaymentTransaction",
+      "description": "Verified transaction record for subscription activation and refund management",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "userEmail": { "type": "string", "maxLength": 150 },
+        "userName": { "type": "string", "maxLength": 100 },
+        "planId": { "type": "string", "maxLength": 128 },
+        "planName": { "type": "string", "maxLength": 100 },
+        "billingCycle": { "type": "string", "enum": ["monthly", "yearly"] },
+        "amount": { "type": "number" },
+        "currency": { "type": "string", "maxLength": 10 },
+        "paymentMethod": { "type": "string", "enum": ["jazzcash", "debit_card", "credit_card", "google_play", "bank_transfer"] },
+        "transactionReference": { "type": "string", "maxLength": 150 },
+        "jazzcashNumber": { "type": "string", "maxLength": 50 },
+        "senderPhone": { "type": "string", "maxLength": 50 },
+        "receiptUrl": { "type": "string", "maxLength": 2000 },
+        "status": { "type": "string", "enum": ["completed", "pending", "rejected", "failed", "refunded"] },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "completedAt": { "type": "string", "maxLength": 50 },
+        "verifiedBy": { "type": "string", "maxLength": 150 },
+        "activatedAt": { "type": "string", "maxLength": 50 },
+        "expiresAt": { "type": "string", "maxLength": 50 },
+        "notes": { "type": "string", "maxLength": 1000 },
+        "rejectionReason": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["userId", "planId", "amount", "paymentMethod", "status", "transactionReference"]
+    },
+    "VideoReport": {
+      "title": "VideoReport",
+      "description": "User flagged content or copyright complaint",
+      "type": "object",
+      "properties": {
+        "videoId": { "type": "string", "maxLength": 128 },
+        "videoTitle": { "type": "string", "maxLength": 200 },
+        "reporterId": { "type": "string", "maxLength": 128 },
+        "reporterEmail": { "type": "string", "maxLength": 150 },
+        "reason": { "type": "string", "maxLength": 200 },
+        "details": { "type": "string", "maxLength": 1000 },
+        "status": { "type": "string", "enum": ["pending", "investigated", "resolved"] },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["videoId", "reason", "status"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with premium subscription status",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "maxLength": 150 },
+        "displayName": { "type": "string", "maxLength": 100 },
+        "photoURL": { "type": "string", "maxLength": 1000 },
+        "isPremium": { "type": "boolean" },
+        "premiumPlanId": { "type": "string", "maxLength": 100 },
+        "premiumPlanName": { "type": "string", "maxLength": 100 },
+        "premiumActivatedAt": { "type": "string", "maxLength": 50 },
+        "premiumExpiresAt": { "type": "string", "maxLength": 50 },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["email"]
+    },
+    "PlaybackReport": {
+      "title": "PlaybackReport",
+      "description": "Error report filed automatically or manually for broken streams",
+      "type": "object",
+      "properties": {
+        "contentId": { "type": "string", "maxLength": 128 },
+        "contentTitle": { "type": "string", "maxLength": 200 },
+        "contentType": { "type": "string", "maxLength": 50 },
+        "errorType": { "type": "string", "maxLength": 100 },
+        "errorMessage": { "type": "string", "maxLength": 1000 },
+        "status": { "type": "string", "enum": ["open", "investigating", "resolved"] },
+        "reportedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["contentTitle", "errorType", "errorMessage"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Global announcement or platform update",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 200 },
+        "message": { "type": "string", "maxLength": 1000 },
+        "type": { "type": "string", "enum": ["info", "release", "maintenance"] },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["title", "message", "active"]
+    }
+  },
+  "firestore": {
+    "/media/{mediaId}": {
+      "schema": "MediaItem",
+      "description": "Collection of movies, dramas, cartoons, and videos"
+    },
+    "/media/{mediaId}/episodes/{episodeId}": {
+      "schema": "Episode",
+      "description": "Episodes for a drama or cartoon series"
+    },
+    "/live_channels/{channelId}": {
+      "schema": "LiveChannel",
+      "description": "Live television broadcast channels"
+    },
+    "/user_videos/{videoId}": {
+      "schema": "UserVideo",
+      "description": "User uploaded videos awaiting moderation or approved"
+    },
+    "/premium_plans/{planId}": {
+      "schema": "PremiumPlan",
+      "description": "Configurable monthly/yearly subscription plans"
+    },
+    "/payments/{paymentId}": {
+      "schema": "PaymentTransaction",
+      "description": "Payment records for verified subscriptions"
+    },
+    "/video_reports/{reportId}": {
+      "schema": "VideoReport",
+      "description": "Flagged inappropriate or copyright video reports"
+    },
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile with premium subscription info"
+    },
+    "/playback_reports/{reportId}": {
+      "schema": "PlaybackReport",
+      "description": "Stream error diagnostic reports"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "Platform announcements and notifications"
+    }
+  }
+}

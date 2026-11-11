@@ -1,0 +1,124 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwnerEmail() {
+      return isSignedIn() && (
+        request.auth.token.email == 'granfbob@gmail.com' ||
+        request.auth.token.email == 'mrjavedhussain3@gmail.com'
+      );
+    }
+
+    function isAdmin() {
+      return isOwnerEmail();
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // User Profiles
+    match /users/{userId} {
+      allow get: if isValidId(userId) && (isAdmin() || (isSignedIn() && request.auth.uid == userId));
+      allow list: if isAdmin();
+      allow create, update: if isValidId(userId) && (isAdmin() || (isSignedIn() && request.auth.uid == userId));
+      allow delete: if isAdmin();
+    }
+
+    // Media collection (Movies, Dramas, Cartoons, YouTube URLs)
+    match /media/{mediaId} {
+      allow get: if isValidId(mediaId) && (isAdmin() || resource.data.isPublished == true);
+      allow list: if isAdmin() || resource.data.isPublished == true;
+      allow create: if isAdmin() && isValidId(mediaId);
+      allow update: if isAdmin() && isValidId(mediaId);
+      allow delete: if isAdmin() && isValidId(mediaId);
+
+      // Subcollection for episodes
+      match /episodes/{episodeId} {
+        allow get: if isValidId(mediaId) && isValidId(episodeId);
+        allow list: if isValidId(mediaId);
+        allow create: if isAdmin() && isValidId(mediaId) && isValidId(episodeId);
+        allow update: if isAdmin() && isValidId(mediaId) && isValidId(episodeId);
+        allow delete: if isAdmin() && isValidId(mediaId) && isValidId(episodeId);
+      }
+    }
+
+    // User Uploaded Videos (with moderation flow)
+    match /user_videos/{videoId} {
+      allow get: if isValidId(videoId) && (
+        isAdmin() ||
+        resource.data.status == 'approved' ||
+        (isSignedIn() && resource.data.userId == request.auth.uid)
+      );
+      allow list: if isAdmin() || resource.data.status == 'approved' || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if isValidId(videoId) && isSignedIn() && (
+        request.resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow update: if isValidId(videoId) && (
+        isAdmin() ||
+        (isSignedIn() && resource.data.userId == request.auth.uid)
+      );
+      allow delete: if isValidId(videoId) && (
+        isAdmin() ||
+        (isSignedIn() && resource.data.userId == request.auth.uid)
+      );
+    }
+
+    // Premium Plans
+    match /premium_plans/{planId} {
+      allow get: if isValidId(planId) && (isAdmin() || resource.data.isActive == true);
+      allow list: if isAdmin() || resource.data.isActive == true;
+      allow create, update, delete: if isValidId(planId) && isAdmin();
+    }
+
+    // Payment Transactions
+    match /payments/{paymentId} {
+      allow get: if isValidId(paymentId) && (isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid));
+      allow list: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if isValidId(paymentId) && isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isValidId(paymentId) && (isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid));
+      allow delete: if isValidId(paymentId) && isAdmin();
+    }
+
+    // Video Reports (flagged content)
+    match /video_reports/{reportId} {
+      allow get: if isValidId(reportId) && isAdmin();
+      allow list: if isAdmin();
+      allow create: if isValidId(reportId) && isSignedIn();
+      allow update, delete: if isValidId(reportId) && isAdmin();
+    }
+
+    // Live Channels collection
+    match /live_channels/{channelId} {
+      allow get: if isValidId(channelId) && (isAdmin() || resource.data.isPublished == true);
+      allow list: if isAdmin() || resource.data.isPublished == true;
+      allow create: if isAdmin() && isValidId(channelId);
+      allow update: if isAdmin() && isValidId(channelId);
+      allow delete: if isAdmin() && isValidId(channelId);
+    }
+
+    // Playback error reports
+    match /playback_reports/{reportId} {
+      allow get: if isValidId(reportId) && isAdmin();
+      allow list: if isAdmin();
+      allow create: if isValidId(reportId);
+      allow update, delete: if isValidId(reportId) && isAdmin();
+    }
+
+    // Notifications / Announcements
+    match /notifications/{notificationId} {
+      allow get: if isValidId(notificationId) && (isAdmin() || resource.data.active == true);
+      allow list: if isAdmin() || resource.data.active == true;
+      allow create, update, delete: if isValidId(notificationId) && isAdmin();
+    }
+  }
+}

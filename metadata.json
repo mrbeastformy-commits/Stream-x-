@@ -1,0 +1,6 @@
+{
+  "name": "STREAMX - Entertainment Without Limits",
+  "description": "Stream movies, dramas, cartoons, and live TV with STREAMX - the complete OTT streaming platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
